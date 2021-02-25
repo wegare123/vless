@@ -64,8 +64,8 @@ fi
 ##read -p "default path: $path2 : " path
 ##[ -z "${path}" ] && path="$path2"
 
-echo "Pilih method network ws/tcp" 
-read -p "default network: $ws2 : " ws
+echo "Pilih method flow ws/tcp" 
+read -p "default flow: $ws2 : " ws
 [ -z "${ws}" ] && ws="$ws2"
 
 ##echo "Pilih method tls tls/none" 
