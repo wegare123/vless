@@ -124,6 +124,7 @@ cat <<EOF> /root/akun/vless.json
         "tlsSettings": {
 EOF
 if [ "$tls" = "tls" ]; then
+cat <<EOF>> /root/akun/vless.json
           "allowInsecure": true,
           "serverName": "$bug"
         },
@@ -154,6 +155,7 @@ if [ "$tls" = "tls" ]; then
 }
 EOF
 elif [ "$tls" = "none" ]; then
+cat <<EOF>> /root/akun/vless.json
       },
         "wsSettings": {
           "headers": {
