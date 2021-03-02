@@ -280,7 +280,17 @@ else
 echo "Anda belum memilih method v2ray/xray"
 exit
 fi
-
+if [[ -z $path ]]; then
+path="-"
+elif [[ -z $udp ]]; then
+udp="-"
+elif [[ -z $ws ]]; then
+ws="-"
+elif [[ -z $tls ]]; then
+tls="-"
+elif [[ -z $met ]]; then
+met="-"
+fi
 echo "$host
 $port
 $path
