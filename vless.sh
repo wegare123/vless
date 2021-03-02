@@ -1,16 +1,16 @@
 #!/bin/bash
 #vless (Wegare)
 clear
-udp2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $7}')" 
+udp2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $6}')" 
 host2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $1}')" 
 port2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $2}')" 
 bug2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $5}')" 
 user2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $4}')" 
-#path2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $3}')" 
-#aid2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $6}')" 
-ws2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $8}')" 
-#tls2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $9}')" 
-#protocol2="$(cat /root/akun/vless.txt | grep -i protocol | cut -d= -f2 | tail -n1)" 
+path2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $3}')" 
+ws2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $7}')" 
+tls2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $8}')" 
+met2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $9}')" 
+
 echo "Inject vless by wegare"
 echo "1. Sett Profile"
 echo "2. Start Inject"
@@ -21,6 +21,9 @@ echo "e. exit"
 read -p "(default tools: 2) : " tools
 [ -z "${tools}" ] && tools="2"
 if [ "$tools" = "1" ]; then
+echo "Pilih method v2ray/xray" 
+read -p "default method: $met2 : " met
+[ -z "${met}" ] && met="$met2"
 
 echo "Masukkan host/ip" 
 read -p "default host/ip: $host2 : " host
@@ -52,35 +55,144 @@ badvpn="--socks-server-addr 127.0.0.1:1080 --udpgw-remote-server-addr 127.0.0.1:
 else
 badvpn="--socks-server-addr 127.0.0.1:1080"
 fi
-#echo "Masukkan protocol" 
-#read -p "default protocol: $protocol2 : " protocol
-##[ -z "${protocol}" ] && protocol="$protocol2"
 
-##echo "Masukkan alterld/aid" 
-#read -p "default alterld/aid: $aid2 : " aid
-##[ -z "${aid}" ] && aid="$aid2"
+if [ "$met" = "v2ray" ]; then
+echo "Pilih method network ws/tcp" 
+read -p "default network: $ws2 : " ws
+[ -z "${ws}" ] && ws="$ws2"
 
-##echo "Masukkan path" 
-##read -p "default path: $path2 : " path
-##[ -z "${path}" ] && path="$path2"
+echo "Masukkan path" 
+read -p "default path: $path2 : " path
+[ -z "${path}" ] && path="$path2"
 
+echo "Pilih method tls tls/none" 
+read -p "default tls: $tls2 : " tls
+[ -z "${tls}" ] && tls="$tls2"
+
+cat <<EOF> /root/akun/vless.json
+{
+  "inbounds": [
+    {
+      "listen": "127.0.0.1",
+      "port": 1080,
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": true,
+        "userLevel": 8
+      },
+      "sniffing": {
+        "destOverride": [
+          "http",
+          "tls"
+        ],
+        "enabled": true
+      },
+      "tag": "socks"
+    }
+  ],
+  "log": {
+    "loglevel": "warning"
+  },
+  "outbounds": [
+    {
+      "mux": {
+        "concurrency": -1,
+        "enabled": false
+      },
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "$host",
+            "port": $port,
+            "users": [
+              {
+                "alterId": 0,
+                "encryption": "none",
+                "id": "$user",
+                "level": 8,
+                "security": "auto"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "$ws",
+        "security": "$tls",
+        "tlsSettings": {
+EOF
+if [ "$tls" = "tls" ]; then
+          "allowInsecure": true,
+          "serverName": "$bug"
+        },
+          "path": "$path"
+        }
+      },
+      "tag": "proxy"
+    },
+    {
+      "protocol": "freedom",
+      "settings": {},
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      },
+      "tag": "block"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": []
+  }
+}
+EOF
+elif [ "$tls" = "none" ]; then
+      },
+        "wsSettings": {
+          "headers": {
+            "Host": "$bug"
+          },
+          "path": "$path"
+        }
+      },
+      "tag": "proxy"
+    },
+    {
+      "protocol": "freedom",
+      "settings": {},
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      },
+      "tag": "block"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": []
+  }
+}
+EOF
+else
+echo "Anda belum memilih method tls"
+exit
+fi
+if [ "$met" = "xray" ]; then
 echo "Pilih method flow ws/tcp" 
 read -p "default flow: $ws2 : " ws
 [ -z "${ws}" ] && ws="$ws2"
-
-##echo "Pilih method tls tls/none" 
-#read -p "default tls: $tls2 : " tls
-##[ -z "${tls}" ] && tls="$tls2"
-
-echo "$host
-$port
-path
-$user
-$bug
-aid
-$udp
-$ws
-tls" > /root/akun/vless.txt
 cat <<EOF> /root/akun/vless.json
 {
   "inbounds": [
@@ -162,6 +274,21 @@ cat <<EOF> /root/akun/vless.json
   }
 }
 EOF
+else
+echo "Anda belum memilih method v2ray/xray"
+exit
+fi
+
+echo "$host
+$port
+$path
+$user
+$bug
+$udp
+$ws
+$tls
+$met" > /root/akun/vless.txt
+
 cat <<EOF> /usr/bin/gproxy-vless
 badvpn-tun2socks --tundev tun1 --netif-ipaddr 10.0.0.2 --netif-netmask 255.255.255.0 $badvpn --udpgw-connection-buffer-size 65535 --udpgw-transparent-dns &
 EOF
@@ -176,8 +303,12 @@ echo "ipmodem=$ipmodem" > /root/akun/ipmodem.txt
 udp="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $7}')" 
 host="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $1}')" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)"
-
+met="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $9}')" 
+if [ "$met" = "v2ray" ]; then
+v2ray -c /root/akun/vless.json &
+elif [ "$met" = "xray" ]; then
 xray -c /root/akun/vless.json &
+fi
 sleep 3
 ip tuntap add dev tun1 mode tun
 ifconfig tun1 10.0.0.1 netmask 255.255.255.0
@@ -198,7 +329,7 @@ elif [ "${tools}" = "3" ]; then
 host="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $1}')" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)" 
 #killall screen
-killall -q badvpn-tun2socks xray ping-vless fping
+killall -q badvpn-tun2socks v2ray xray ping-vless fping
 route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
 route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
 route del "$host" gw "$route" metric 0 2>/dev/null
