@@ -32,6 +32,10 @@ fi
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/vless/main/vless.sh" -O /usr/bin/vless
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/vless/main/autorekonek-vless.sh" -O /usr/bin/autorekonek-vless
 wget --no-check-certificate "https://github.com/wegare123/vless/blob/main/openwrt-xray_1.3.0-1_aarch64_cortex-a53.ipk?raw=true" -O ~/xray.ipk
+wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/vmt/main/v2ray" -O /usr/bin/v2ray
+wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/vmt/main/v2ctl" -O /usr/bin/v2ctl
+wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/vmt/main/geoip.dat" -O /usr/bin/geoip.dat
+wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/vmt/main/geosite.dat" -O /usr/bin/geosite.dat
 cek2=$(opkg list-installed | grep dnsmasq-full | awk '{print $1}')
 if [ $cek2 = "dnsmasq-full" ]; then
 echo > /dev/null
@@ -41,6 +45,8 @@ fi
 opkg install resolveip dnsmasq-full ip-full ipset jshn lsof fping && opkg install *.ipk
 chmod +x /usr/bin/vless
 chmod +x /usr/bin/autorekonek-vless
+chmod +x /usr/bin/v2ray
+chmod +x /usr/bin/v2ctl
 rm -r ~/*.ipk
 rm -r ~/install.sh
 mkdir -p ~/akun/
