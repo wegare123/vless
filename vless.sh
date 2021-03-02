@@ -191,7 +191,7 @@ else
 echo "Anda belum memilih method tls"
 exit
 fi
-if [ "$met" = "xray" ]; then
+elif [ "$met" = "xray" ]; then
 echo "Pilih method flow ws/tcp" 
 read -p "default flow: $ws2 : " ws
 [ -z "${ws}" ] && ws="$ws2"
