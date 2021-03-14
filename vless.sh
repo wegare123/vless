@@ -291,6 +291,9 @@ tls="-"
 elif [[ -z $met ]]; then
 met="-"
 fi
+elif [[ -z $tls ]]; then
+tls="-"
+fi
 echo "$host
 $port
 $path
