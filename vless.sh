@@ -291,9 +291,6 @@ tls="-"
 elif [[ -z $met ]]; then
 met="-"
 fi
-elif [[ -z $tls ]]; then
-tls="-"
-fi
 echo "$host
 $port
 $path
@@ -318,7 +315,7 @@ echo "ipmodem=$ipmodem" > /root/akun/ipmodem.txt
 udp="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $7}')" 
 host="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $1}')" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)"
-met="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $9}')" 
+met="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $8}')" 
 if [ "$met" = "v2ray" ]; then
 v2ray -c /root/akun/vless.json &
 elif [ "$met" = "xray" ]; then
