@@ -8,8 +8,8 @@ bug2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $5}')"
 user2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $4}')" 
 path2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $3}')" 
 ws2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $7}')" 
-tls2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $8}')" 
-met2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $9}')" 
+met2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $8}')" 
+tls2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $9}')" 
 
 echo "Inject vless by wegare"
 echo "1. Sett Profile"
@@ -301,8 +301,8 @@ $user
 $bug
 $udp
 $ws
-$tls
-$met" > /root/akun/vless.txt
+$met
+$tls" > /root/akun/vless.txt
 
 cat <<EOF> /usr/bin/gproxy-vless
 badvpn-tun2socks --tundev tun1 --netif-ipaddr 10.0.0.2 --netif-netmask 255.255.255.0 $badvpn --udpgw-connection-buffer-size 65535 --udpgw-transparent-dns &
