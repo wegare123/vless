@@ -128,6 +128,10 @@ cat <<EOF>> /root/akun/vless.json
           "allowInsecure": true,
           "serverName": "$bug"
         },
+        "wsSettings": {
+          "headers": {
+            "Host": "$bug"
+          },
           "path": "$path"
         }
       },
