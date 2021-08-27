@@ -199,6 +199,7 @@ elif [ "$met" = "xray" ]; then
 echo "Pilih method flow ws/tcp" 
 read -p "default flow: $ws2 : " ws
 [ -z "${ws}" ] && ws="$ws2"
+if [ "$ws" = "tcp" ]; then
 cat <<EOF> /root/akun/vless.json
 {
   "inbounds": [
@@ -280,6 +281,142 @@ cat <<EOF> /root/akun/vless.json
   }
 }
 EOF
+elif [ "$ws" = "ws" ]; then
+echo "Masukkan path" 
+read -p "default path: $path2 : " path
+[ -z "${path}" ] && path="$path2"
+
+echo "Pilih method tls tls/none" 
+read -p "default tls: $tls2 : " tls
+[ -z "${tls}" ] && tls="$tls2"
+
+cat <<EOF> /root/akun/vless.json
+{
+  "inbounds": [
+    {
+      "listen": "127.0.0.1",
+      "port": 1080,
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": true,
+        "userLevel": 8
+      },
+      "sniffing": {
+        "destOverride": [
+          "http",
+          "tls"
+        ],
+        "enabled": true
+      },
+      "tag": "socks"
+    }
+  ],
+  "log": {
+    "loglevel": "warning"
+  },
+  "outbounds": [
+    {
+      "mux": {
+        "concurrency": -1,
+        "enabled": false
+      },
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "$host",
+            "port": $port,
+            "users": [
+              {
+                "alterId": 0,
+                "encryption": "none",
+                "id": "$user",
+                "level": 8,
+                "security": "auto"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "$ws",
+        "security": "$tls",
+        "tlsSettings": {
+EOF
+if [ "$tls" = "tls" ]; then
+cat <<EOF>> /root/akun/vless.json
+          "allowInsecure": true,
+          "serverName": "$bug"
+        },
+        "wsSettings": {
+          "headers": {
+            "Host": "$bug"
+          },
+          "path": "$path"
+        }
+      },
+      "tag": "proxy"
+    },
+    {
+      "protocol": "freedom",
+      "settings": {},
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      },
+      "tag": "block"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": []
+  }
+}
+EOF
+elif [ "$tls" = "none" ]; then
+cat <<EOF>> /root/akun/vless.json
+      },
+        "wsSettings": {
+          "headers": {
+            "Host": "$bug"
+          },
+          "path": "$path"
+        }
+      },
+      "tag": "proxy"
+    },
+    {
+      "protocol": "freedom",
+      "settings": {},
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      },
+      "tag": "block"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": []
+  }
+}
+EOF
+else
+echo "Anda belum memilih method tls"
+exit
+fi
+fi
 else
 echo "Anda belum memilih method v2ray/xray"
 exit
