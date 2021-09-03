@@ -3,14 +3,12 @@
 stop () {
 host="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $1}')" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)" 
-#killall screen
 killall -q badvpn-tun2socks v2ray xray ping-vless fping
 route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
 route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
 route del "$host" gw "$route" metric 0 2>/dev/null
 ip link delete tun1 2>/dev/null
 /etc/init.d/dnsmasq restart 2>/dev/null
-sleep 2
 }
 udp2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $6}')" 
 host2="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $1}')" 
