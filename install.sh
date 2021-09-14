@@ -40,6 +40,8 @@ wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/vmt/mai
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/vmt/main/geosite.dat" -O /usr/share/xray/geosite.dat
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/vmt/main/geoip.dat" -O /usr/share/v2ray/geoip.dat
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/vmt/main/geosite.dat" -O /usr/share/v2ray/geosite.dat
+wget --no-check-certificate "https://github.com/wegare123/backup/blob/main/tun2socks?raw=true" -O /usr/bin/tun2socks
+chmod +x /usr/bin/tun2socks
 cek2=$(opkg list-installed | grep dnsmasq-full | awk '{print $1}')
 if [ $cek2 = "dnsmasq-full" ]; then
 echo > /dev/null
@@ -60,6 +62,7 @@ rm -r ~/*.ipk
 rm -r ~/install.sh
 mkdir -p ~/akun/
 touch ~/akun/vless.txt
+touch ~/akun/ipmodem.txt 
 sleep 2
 echo "install selesai"
 echo "untuk memulai tools silahkan jalankan perintah 'vless'"

@@ -55,14 +55,14 @@ if [ "$pilih" = "y" ]; then
 echo "Masukkan port udpgw" 
 read -p "default udpgw: $udp2 : " udp
 [ -z "${udp}" ] && udp="$udp2"
-badvpn="--socks-server-addr 127.0.0.1:1080 --udpgw-remote-server-addr 127.0.0.1:$udp"
+badvpn="badvpn-tun2socks --tundev tun1 --netif-ipaddr 10.0.0.2 --netif-netmask 255.255.255.0 --socks-server-addr 127.0.0.1:1080 --udpgw-remote-server-addr 127.0.0.1:$udp --udpgw-connection-buffer-size 65535 --udpgw-transparent-dns &"
 elif [ "$pilih" = "Y" ]; then
 echo "Masukkan port udpgw" 
 read -p "default udpgw: $udp2 : " udp
 [ -z "${udp}" ] && udp="$udp2"
-badvpn="--socks-server-addr 127.0.0.1:1080 --udpgw-remote-server-addr 127.0.0.1:$udp"
+badvpn="badvpn-tun2socks --tundev tun1 --netif-ipaddr 10.0.0.2 --netif-netmask 255.255.255.0 --socks-server-addr 127.0.0.1:1080 --udpgw-remote-server-addr 127.0.0.1:$udp --udpgw-connection-buffer-size 65535 --udpgw-transparent-dns &"
 else
-badvpn="--socks-server-addr 127.0.0.1:1080"
+badvpn='tun2socks -tunAddr "10.0.0.1" -tunGw  "10.0.0.2" -tunMask "255.255.255.0" -tunName "tun1" -tunDns "8.8.8.8,8.8.4.4" -proxyType "socks" -proxyServer "127.0.0.1:1080" &'
 fi
 
 if [ "$met" = "v2ray" ]; then
@@ -452,7 +452,7 @@ $met
 $tls" > /root/akun/vless.txt
 
 cat <<EOF> /usr/bin/gproxy-vless
-badvpn-tun2socks --tundev tun1 --netif-ipaddr 10.0.0.2 --netif-netmask 255.255.255.0 $badvpn --udpgw-connection-buffer-size 65535 --udpgw-transparent-dns &
+$badvpn
 EOF
 chmod +x /usr/bin/gproxy-vless
 echo "Sett Profile Sukses"
@@ -460,6 +460,11 @@ sleep 2
 clear
 /usr/bin/vless
 elif [ "${tools}" = "2" ]; then
+cek="$(cat /root/akun/vless.txt)"
+if [[ -z $cek ]]; then
+echo "anda belum membuat profile"
+exit
+fi
 stop
 ipmodem="$(route -n | grep -i 0.0.0.0 | head -n1 | awk '{print $2}')" 
 echo "ipmodem=$ipmodem" > /root/akun/ipmodem.txt
