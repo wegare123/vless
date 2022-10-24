@@ -3,7 +3,7 @@
 stop () {
 host="$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $1}')" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)" 
-killall -q badvpn-tun2socks v2ray xray ping-vless fping
+killall -q badvpn-tun2socks v2ray xray ping-vless httping
 route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
 route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
 route del "$host" gw "$route" metric 0 2>/dev/null
@@ -205,8 +205,8 @@ echo "Anda belum memilih method tls"
 exit
 fi
 elif [ "$met" = "xray" ]; then
-echo "Pilih method flow ws/tcp" 
-read -p "default flow: $ws2 : " ws
+echo "Pilih method network ws/tcp/grpc" 
+read -p "default network: $ws2 : " ws
 [ -z "${ws}" ] && ws="$ws2"
 if [ "$ws" = "tcp" ]; then
 cat <<EOF> /root/akun/vless.json
@@ -290,6 +290,97 @@ cat <<EOF> /root/akun/vless.json
   }
 }
 EOF
+
+elif [ "$ws" = "grpc" ]; then
+echo "Masukkan path" 
+read -p "default path: $path2 : " path
+[ -z "${path}" ] && path="$path2"
+cat <<EOF> /root/akun/vless.json
+{
+  "inbounds": [
+    {
+      "listen": "127.0.0.1",
+      "port": 1080,
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": true,
+        "userLevel": 8
+      },
+      "sniffing": {
+        "destOverride": [
+          "http",
+          "tls"
+        ],
+        "enabled": true
+      },
+      "tag": "socks"
+    }
+  ],
+  "log": {
+    "loglevel": "warning"
+  },
+  "outbounds": [
+    {
+      "mux": {
+        "concurrency": -1,
+        "enabled": false
+      },
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "$host",
+            "port": $port,
+            "users": [
+              {
+                "alterId": 0,
+                "encryption": "none",
+                "flow": "",
+                "id": "$user",
+                "level": 8,
+                "security": "auto"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "grpcSettings": {
+          "multiMode": true,
+          "serviceName": "$path"
+        },
+        "network": "grpc",
+        "security": "tls",
+        "tlsSettings": {
+          "allowInsecure": true,
+          "serverName": "$bug"
+        }
+      },
+      "tag": "proxy"
+    },
+    {
+      "protocol": "freedom",
+      "settings": {},
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      },
+      "tag": "block"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": []
+  }
+}
+EOF
+
 elif [ "$ws" = "ws" ]; then
 echo "Masukkan path" 
 read -p "default path: $path2 : " path
@@ -485,11 +576,10 @@ route add 8.8.8.8 gw $route metric 0
 route add 8.8.4.4 gw $route metric 0
 route add $host gw $route metric 0
 route add default gw 10.0.0.2 metric 0
-echo "
+echo '
 #!/bin/bash
 #vless (Wegare)
-host=$(cat /root/akun/vless.txt | tr '\n' ' '  | awk '{print $1}')
-fping -l $host" > /usr/bin/ping-vless
+httping m.google.com' > /usr/bin/ping-vless
 chmod +x /usr/bin/ping-vless
 /usr/bin/ping-vless > /dev/null 2>&1 &
 sleep 5

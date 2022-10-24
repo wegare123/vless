@@ -48,7 +48,7 @@ echo > /dev/null
 else
 opkg remove dnsmasq && opkg install dnsmasq-full
 fi
-opkg install resolveip ip-full ipset jshn lsof fping && opkg install *.ipk
+opkg install resolveip ip-full ipset jshn lsof httping && opkg install *.ipk
 chmod +x /usr/bin/vless
 chmod +x /usr/bin/autorekonek-vless
 chmod +x /usr/bin/xray
